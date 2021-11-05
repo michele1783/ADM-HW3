@@ -12,31 +12,27 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 import requests
 from tqdm import tqdm
-    
+
+nFolders = 4
+
 def crawl(url_file):
     Path("directory").mkdir(exist_ok=True)
-    for i in range(1,5):
+    for i in range(1,nFolders+1):
         nomeCartella = 'cartella{}'.format(i)
         Path(nomeCartella).mkdir(exist_ok=True)
+    num_lines = sum(1 for line in open(url_file))
+    pagesPerFolder = num_lines/nFolders
     a = open(url_file, "r")
     c = 0
-    number = 1
-    for i in a:
-        c = c + 1 
+
+    for i in a: 
         page = requests.get(i)
         soup = BeautifulSoup(page.content, features ="lxml")
-        f = open("page_{}.html".format(c), "w")
+        number = int(c/(pagesPerFolder)) + 1
+        f = open("./cartella{}".format(number) + "/page_{}.html".format(c+1), "w",encoding="utf-8")
         f.write(soup.prettify())
-        if c <= 5000:
-            number = 1
-        elif (c > 5000 and c <= 10000):
-            number = 2
-        elif (c > 10000 and c <= 15000):
-            number = 3
-        elif (c > 15000 and c <= 20000):
-            number = 4
-        shutil.move("page_{}.html".format(c), "/Users/michele/ADM2021/cartella{}".format(number))
         f.close()
+        c = c + 1
 
 def get_urls(init_url, number_pages):
     anime = []
@@ -49,6 +45,7 @@ def get_urls(init_url, number_pages):
             for link in links:
                 if type(link.get("id")) == str and len(link.contents[0]) >1:
                     anime.append((link.get("href")))
+    
     with open('urls.txt', 'w') as f:
         for item in tqdm(anime):
             f.write("%s\n" % item)  
