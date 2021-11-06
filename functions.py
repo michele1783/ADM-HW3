@@ -14,7 +14,7 @@ import requests
 from tqdm import tqdm
 import time
 
-nFolders = 200
+nFolders = 400
 
 def crawl(url_file):
     Path("directory").mkdir(exist_ok=True)
@@ -24,15 +24,17 @@ def crawl(url_file):
     num_lines = sum(1 for line in open(url_file))
     pagesPerFolder = num_lines/nFolders
     a = open(url_file, "r")
-    c = 900
-    lastFolder = 1
+    c = 400
+    lastFolder = 9
     for i in a: 
         page = requests.get(i)
         soup = BeautifulSoup(page.content, features ="lxml")
         number = int(c/(pagesPerFolder)) + 1
         if number != lastFolder:
+            print("I'm waiting")
             lastFolder = number
-            time.sleep(120)            
+            time.sleep(300)            
+        print("Going to save in cartella" + str(number) + ", the page " + str(c+1))
         f = open("./cartella{}".format(number) + "/page_{}.html".format(c+1), "w",encoding="utf-8")
         f.write(soup.prettify())
         f.close()
