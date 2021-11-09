@@ -36,29 +36,27 @@ def get_urls(init_url, number_pages):
             
 def crawl(url_file):
     Path("directory").mkdir(exist_ok=True)
-    for i in range(1,5):
+    for i in range(1,nFolders+1):
         nomeCartella = 'cartella{}'.format(i)
         Path(nomeCartella).mkdir(exist_ok=True)
+    num_lines = sum(1 for line in open(url_file))
+    pagesPerFolder = num_lines/nFolders
     a = open(url_file, "r")
     c = 0
-    number = 1
+    lastFolder = 200
     for i in a:
-        c = c + 1 
         page = requests.get(i)
-        time.sleep(5)
         soup = BeautifulSoup(page.content, features ="lxml")
-        f = open("page_{}.html".format(c), "w")
+        number = int(c/(pagesPerFolder)) + 1
+        if number != lastFolder:
+            print("I'm waiting")
+            lastFolder = number
+            time.sleep(300)            
+        print("Going to save in cartella" + str(number) + ", the page " + str(c+1))
+        f = open("./cartella{}".format(number) + "/page_{}.html".format(c+1), "w",encoding="utf-8")
         f.write(soup.prettify())
-        if c <= 5000:
-            number = 1
-        elif (c > 5000 and c <= 10000):
-            number = 2
-        elif (c > 10000 and c <= 15000):
-            number = 3
-        elif (c > 15000 and c <= 20000):
-            number = 4
-        shutil.move("page_{}.html".format(c), "/Users/michele/ADM2021/cartella{}".format(number))
         f.close()
+        c = c + 1
         
 def findField(array, word):
     for x in array:
@@ -85,12 +83,12 @@ def cleaner(text):
 
 def create_vocabulary(data):
     ### Input == I use like input the dataset obtain in exercise 1 where i apply the clean text function
-    ### Output == I obtain a vocabulary, the keys are all tokens (with no repeat) contained in the plot for the each rows
-    ### for each token I define the index of the rows where the token is in the plot
+    ### Output == I obtain a vocabulary, the keys are all tokens (with no repeat) contained in the synopsis for the each rows
+    ### for each token I define the index of the rows where the token is in the synopsis
     voc = {}
     for i, row in data.iterrows():
-            if len(data.at[i, "Plot"]) > 0:  # check if the list is empty or not to avoid the eventually error
-                for word in data.at[i, "Plot"]: # bring the token from the list
+            if len(data.at[i, "Synopsis"]) > 0:  # check if the list is empty or not to avoid the eventually error
+                for word in data.at[i, "Synopsis"]: # bring the token from the list
                     if word in voc.keys(): # insert the token into the vocabulary with the documents where this is present
                         if i not in voc[word]:
                             voc[word].append(i)
