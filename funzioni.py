@@ -27,7 +27,7 @@ def get_urls(init_url, number_pages):
         for tag in soup.find_all("tr"):#cerco le righe della tabella
             links = tag.find_all("a")
             for link in links:
-                if type(link.get("id")) == str and len(link.contents[0]) >1:
+                if type(link.get("id")) == str and len(link.contents[0]) >1 and link not in anime:
                     anime.append((link.get("href")))
     anime = list(set(anime))
     with open('urls.txt', 'w') as f:
