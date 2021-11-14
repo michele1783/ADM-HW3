@@ -361,14 +361,14 @@ def inverted_list_2(voc, df):
     return inv_lst2
 
 #used in order to compute tf-idf of the query
-def queries(query, voc, data):
+def queries(query):
 #our query
-    indexes = list(voc.keys())
+    indexes = list(vocabulary.keys())
     query = query.split() 
     query_score = []
     for key in query: #for each token in our query, not anymore all token 
         try:
-            lst_doc = voc[key] # retrieve the pages
+            lst_doc = vocabulary[key] # retrieve the pages
 
             tf = query.count(key) / len(query) #tf of the i-th word 
 
@@ -406,3 +406,27 @@ def qnorma(query_score): #compute the norm of the query
         q_norm_2 += q_norm[i] #sum them
     q_norm = math.sqrt(q_norm_2) #compute the square root
     return(q_norm)
+
+#used for the last point
+def Search3(cleanQString, vocab, df, inv_lst):
+    term_id = fun.map_terms_id(vocab, cleanQString) # return the corresponding id of those terms
+
+    # find the common documents where those terms are present
+    intersection_list = []
+    for term in term_id:
+        if not intersection_list:
+            intersection_list = inv_lst[term] 
+            # if the intersection list is empty insert the first list of the first token
+        else:
+            intersection_list = set(intersection_list).intersection(set(inv_lst[term])) 
+            # make the intersection, this respect the properties of the sets
+
+    new_df = pd.DataFrame(columns=['animeTitle', 'animeDescription', 'Url']) # create the new dataset according to the professors' requests
+    for row in intersection_list:
+        #append row to the dataframe
+        #we have parsed also the url
+        new_row = {'animeTitle': df.loc[row, "animeTitle"], 'animeDescription': df.loc[row, "animeDescription"], 'Url': df.loc[row, "Url"],\
+                  'animeScore': df.loc[row, "animeScore"], 'animeRank': df.loc[row, "animeRank"]}
+        new_df = new_df.append(new_row, ignore_index=True)
+        
+    return new_df
