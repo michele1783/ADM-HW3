@@ -4,6 +4,6 @@ In this project we have looked for the best anime in the world. We downloaded th
 
 ## Content Description
 - funzioni.py is a custom module where you can find all our functions that were used in main;
-- Homework.ipybn is the notebook containing the code used to get the answers and the theoretical question.
--  
+- Homework.ipynb is the notebook containing the code used to get the answers and the theoretical question.
+ 
 
